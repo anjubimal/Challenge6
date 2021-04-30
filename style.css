@@ -1,0 +1,41 @@
+header{
+    text-align: center;
+    background: rgb(48,183,185);
+    color: aliceblue;
+    padding: 10px;
+    margin: 10px 10px 10px 10px;
+}
+
+.local{
+    padding: 10px;
+    margin-left: 30px;
+    border: 3px solid;
+    border-color: rgb(48,183,185);
+    float: left;
+}
+
+.container{
+    margin-left: 400px;
+}
+
+.stats{
+    margin: 150px 500px 10px 100px;
+    padding: 10px 10px 15px 10px;
+    border-style: solid;
+    border-color: rgb(48,183,185);
+}
+
+
+.fiveday{
+    padding: 100px;
+}
+
+.card{
+    background: rgb(48,183,185);
+    background: linear-gradient(0deg, rgba(48,183,185,1) 35%, rgba(253,187,45,1) 100%);
+    border: none;
+    color: aliceblue;
+    padding: 10px 10px;
+    margin-right: 10px;
+
+}
