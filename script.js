@@ -5,76 +5,133 @@ var temp = document.querySelector('.temp');
 var wind = document.querySelector('.wind');
 var humidity = document.querySelector('.humidity');
 var uv = document.querySelector('.uv');
+var dateToday = document.querySelector('.date');
 
 button.addEventListener('click', function () {
     fetch('https://api.openweathermap.org/data/2.5/weather?q=' + inputValue.value + '&appid=18614d7187766b9dc40dac4826ceade6&units=imperial')
         .then(response => response.json())
         .then(data => {
-            var latitude = data.coord.lon
-            var longitude = data.coord.lat
+            console.log(data)
             var nameValue = data.name
             nameEl.textContent = nameValue;
             
+            var date = moment().format("MMM Do YY").toString();
+            var tempValue = data.main.temp;
+            var windValue = data.wind.speed;
+            var humidityValue = data.main.humidity;
+            
 
 
-            fetch('https://api.openweathermap.org/data/2.5/onecall?lat=' + latitude + '&lon=' + longitude + '&exclude=minutely,hourly&units=imperial&appid=18614d7187766b9dc40dac4826ceade6')
-                .then(function (weather) { return weather.json(); })
-                .then(function (weather) {
+            wind.textContent = 'Wind: ' + windValue;
+            temp.textContent = 'Temp: ' + tempValue;
+            humidity.textContent = 'Humidity: ' + humidityValue;
+            dateToday.textContent = date;
 
-                    // Place weather info into varibles
-                    var tempValue = weather.current.temp;
-                    var windValue = weather.current.wind_speed;
-                    var humidityValue = weather.current.humidity;
-                    var uvValue = weather.current.uvi;
-                    iconLink = "https://openweathermap.org/img/wn/" + weather.current.weather[0].icon + "@2x.png"
+            fiveDayForecast(inputValue.value)
 
+            var latitude = data.coord.lat
+            var longitude = data.coord.lon
+            
 
-                    wind.textContent = 'Wind: ' + windValue;
-                    temp.textContent = 'Temp: ' + tempValue;
-                    humidity.textContent = 'Humidity: ' + humidityValue;
+            fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&appid=18614d7187766b9dc40dac4826ceade6`)
+                .then((res) => res.json())
+                .then(function (data) {
+                    var uvValue = data.current.uvi;
                     uv.textContent = 'UV Index: ' + uvValue;
 
-
-                    function display() {
-                        for (i = 0; i < 5; i++) {
-                            var temp0 = document.querySelector('.temp' + i);
-                            var wind0 = document.querySelector('.wind' + i);
-                            var humidity0 = document.querySelector('.humidity' + i);
-                            var icon = document.querySelector('.icon' + i);
-
-                            
-                            var iconCode = "https://openweathermap.org/img/wn/" + weather.daily[i].weather[0].icon + "@2x.png";
-                            var tempValue0 = weather.daily[i].temp.day;
-                            console.log(tempValue0)
-                            var windValue0 = weather.daily[i].wind_speed;
-                            console.log(windValue0)
-                            var humidityValue0 = weather.daily[i].humidity;
-                            console.log(humidityValue0)
-                            
-
-                            wind0.textContent = 'Wind: ' + windValue0;
-                            temp0.textContent = 'Temp: ' + tempValue0;
-                            humidity0.textContent = 'Humidity: ' + humidityValue0;
-                            icon.src = iconCode;
-                            
-                        
-
-                        }
+                    if(uvValue <2){
+                        uv.style.background = "green"
                     }
 
-                    display();
+                    else if (uvValue >= 3 && uvValue <=5){
+                        uv.style.background = "yellow"
+                    }
 
-                    
+                    else if (uvValue >= 6 && uvValue <= 7) {
+                        uv.style.background = "orange"
+                    }
 
+                    else if (uvValue >= 8 && uvValue <= 10) {
+                        uv.style.background = "red"
+                    }
 
-
-
+                    else if (uvValue >= 11) {
+                        uv.style.background = "purple"
+                    }
+    
+});
         })
 
+        });
 
-    // .catch(err => alert("Wrong city name!"))
-});
-});
+
+
+
+function fiveDayForecast(inputValue) {
+    fetch('https://api.openweathermap.org/data/2.5/forecast?q=' + inputValue + '&appid=18614d7187766b9dc40dac4826ceade6&units=imperial')
+        .then(response => response.json())
+        .then(weather => {
+
+            console.log(weather)
+            console.log("hello")
+
+            var fiveDay = document.querySelector(".fiveday")
+            fiveDay.innerHTML = "<h4>Five Day Forecast: </h4>"
+            var createForecastRow = document.createElement("div")
+
+            for (var i = 0; i < weather.list.length; i++) {
+
+                if (weather.list[i].dt_txt.indexOf("09:00:00") !== -1) {
+                    var colEl = document.createElement('div');
+                    colEl.classList.add('col-md-2');
+                    var cardEl = document.createElement('div');
+                    cardEl.classList.add('card', 'bg-primary', 'text-white');
+                    var windEl = document.createElement('p');
+                    windEl.classList.add('card-text');
+                    windEl.textContent = `Wind Speed: ${weather.list[i].wind.speed} MPH`;
+                    var humidityEl = document.createElement('p');
+                    humidityEl.classList.add('card-text');
+                    humidityEl.textContent = `Humidity : ${weather.list[i].main.humidity} %`;
+                    var bodyEl = document.createElement('div');
+                    bodyEl.classList.add('card-body', 'p-2');
+                    var titleEl = document.createElement('h5');
+                    titleEl.classList.add('card-title');
+                    titleEl.textContent = new Date(
+                        weather.list[i].dt_txt
+                    ).toLocaleDateString();
+                    var imgEl = document.createElement('img');
+                    imgEl.setAttribute(
+                        'src',
+                        `http://openweathermap.org/img/w/${weather.list[i].weather[0].icon}.png`
+                    );
+                    var p1El = document.createElement('p');
+                    p1El.classList.add('card-text');
+                    p1El.textContent = `Temp: ${weather.list[i].main.temp_max} °F`;
+                    var p2El = document.createElement('p');
+                    p2El.classList.add('card-text');
+                    p2El.textContent = `Humidity: ${weather.list[i].main.humidity}%`;
+                    // Merge together and put on page
+                    colEl.appendChild(cardEl);
+                    bodyEl.appendChild(titleEl);
+                    bodyEl.appendChild(imgEl);
+                    bodyEl.appendChild(windEl);
+                    bodyEl.appendChild(humidityEl);
+                    bodyEl.appendChild(p1El);
+                    bodyEl.appendChild(p2El);
+                    cardEl.appendChild(bodyEl);
+                    fiveDay.appendChild(colEl);
+                }
+
+            }
+
+        })
+    }
+
+
+
+
+
+
 
 
 
