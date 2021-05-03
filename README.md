@@ -1,6 +1,6 @@
 # Challenge6
 
-# https://anjubimal.github.io/Challenge6/
+* https://anjubimal.github.io/Challenge6/
 
 
 # Acceptance Criteria
