@@ -6,20 +6,28 @@ var wind = document.querySelector('.wind');
 var humidity = document.querySelector('.humidity');
 var uv = document.querySelector('.uv');
 var dateToday = document.querySelector('.date');
-inputArray = []
+
 
 button.addEventListener('click', function () {
+    fetchWeather(inputValue);
+    displayInput(inputValue.value);
+    saveStorage();
+
+        });
+
+
+function fetchWeather(input){
     fetch('https://api.openweathermap.org/data/2.5/weather?q=' + inputValue.value + '&appid=18614d7187766b9dc40dac4826ceade6&units=imperial')
         .then(response => response.json())
         .then(data => {
             var nameValue = data.name
             nameEl.textContent = nameValue;
-            
+
             var date = moment().format("MMM Do YY").toString();
             var tempValue = data.main.temp;
             var windValue = data.wind.speed;
             var humidityValue = data.main.humidity;
-            
+
 
 
             wind.textContent = 'Wind: ' + windValue;
@@ -31,7 +39,7 @@ button.addEventListener('click', function () {
 
             var latitude = data.coord.lat
             var longitude = data.coord.lon
-            
+
 
             fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&appid=18614d7187766b9dc40dac4826ceade6`)
                 .then((res) => res.json())
@@ -39,11 +47,11 @@ button.addEventListener('click', function () {
                     var uvValue = data.current.uvi;
                     uv.textContent = 'UV Index: ' + uvValue;
 
-                    if(uvValue < 2){
+                    if (uvValue < 2) {
                         uv.style.background = "green"
                     }
 
-                    else if (uvValue >= 3 && uvValue <=5){
+                    else if (uvValue >= 3 && uvValue <= 5) {
                         uv.style.background = "yellow"
                     }
 
@@ -58,18 +66,10 @@ button.addEventListener('click', function () {
                     else {
                         uv.style.background = "purple"
                     }
-    
-});
+
+                });
         })
-
-    
-    inputArray.push(inputValue.value)
-    saveStorage(inputArray);
-
-
-    displayInput(inputValue.value);
-
-        });
+}
 
 
 
@@ -134,7 +134,7 @@ function fiveDayForecast(inputValue) {
     function displayInput(input){
         var local = document.querySelector(".storage")
         local.innerHTML = "<h4>Search History: </h4>"
-        var search = document.createElement('div');
+        var search = document.createElement('button');
         search.classList.add('m-2')
         search.style.background = "lightblue"
         search.textContent = input;
@@ -142,21 +142,26 @@ function fiveDayForecast(inputValue) {
 
         container = document.querySelector('.local')
         container.appendChild(search)
+
+        search.addEventListener('click', function (event){
+            var target = event.target;
+            console.log(target)
+            if (target.type === "button") {
+                fiveDayForecast(inputValue.value)
+                fetchWeather(inputValue.value)
+                }
+
+
+        })
         
     }
 
-    function saveStorage(Array){
-        console.log('here')
-        const localStorageContent = localStorage.getItem('userInput')
-
-        if(localStorageContent === null){
-            Array = [];
-        } else{
-            Array = JSON.parse(localStorageContent);
-        }
-
-        localStorage.setItem('userInput', JSON.stringify(Array));
-        console.log(Array)
-    }
     
- 
+    function saveStorage() {
+        
+        var getInput = JSON.parse(window.localStorage.getItem("userInput")) || []
+        getInput.push(inputValue.value)
+        window.localStorage.setItem("userInput", JSON.stringify(getInput))
+
+    }
+
