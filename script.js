@@ -6,12 +6,12 @@ var wind = document.querySelector('.wind');
 var humidity = document.querySelector('.humidity');
 var uv = document.querySelector('.uv');
 var dateToday = document.querySelector('.date');
+inputArray = []
 
 button.addEventListener('click', function () {
     fetch('https://api.openweathermap.org/data/2.5/weather?q=' + inputValue.value + '&appid=18614d7187766b9dc40dac4826ceade6&units=imperial')
         .then(response => response.json())
         .then(data => {
-            console.log(data)
             var nameValue = data.name
             nameEl.textContent = nameValue;
             
@@ -39,7 +39,7 @@ button.addEventListener('click', function () {
                     var uvValue = data.current.uvi;
                     uv.textContent = 'UV Index: ' + uvValue;
 
-                    if(uvValue <2){
+                    if(uvValue < 2){
                         uv.style.background = "green"
                     }
 
@@ -55,12 +55,19 @@ button.addEventListener('click', function () {
                         uv.style.background = "red"
                     }
 
-                    else if (uvValue >= 11) {
+                    else {
                         uv.style.background = "purple"
                     }
     
 });
         })
+
+    
+    inputArray.push(inputValue.value)
+    saveStorage(inputArray);
+
+
+    displayInput(inputValue.value);
 
         });
 
@@ -72,12 +79,8 @@ function fiveDayForecast(inputValue) {
         .then(response => response.json())
         .then(weather => {
 
-            console.log(weather)
-            console.log("hello")
-
             var fiveDay = document.querySelector(".fiveday")
             fiveDay.innerHTML = "<h4>Five Day Forecast: </h4>"
-            var createForecastRow = document.createElement("div")
 
             for (var i = 0; i < weather.list.length; i++) {
 
@@ -128,12 +131,32 @@ function fiveDayForecast(inputValue) {
     }
 
 
+    function displayInput(input){
+        var local = document.querySelector(".storage")
+        local.innerHTML = "<h4>Search History: </h4>"
+        var search = document.createElement('div');
+        search.classList.add('m-2')
+        search.style.background = "lightblue"
+        search.textContent = input;
+        
 
+        container = document.querySelector('.local')
+        container.appendChild(search)
+        
+    }
 
+    function saveStorage(Array){
+        console.log('here')
+        const localStorageContent = localStorage.getItem('userInput')
 
+        if(localStorageContent === null){
+            Array = [];
+        } else{
+            Array = JSON.parse(localStorageContent);
+        }
 
-
-
-
-
-
+        localStorage.setItem('userInput', JSON.stringify(Array));
+        console.log(Array)
+    }
+    
+ 
